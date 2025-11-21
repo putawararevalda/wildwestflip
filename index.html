@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fliptown Adapted - MVP</title>
+    <title>Wild West Flip</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -29,9 +29,39 @@
         }
 
         /* --- HEADER --- */
-        .header-container { display: flex; justify-content: center; align-items: center; position: relative; width: 100%; max-width: 600px; margin-bottom: 10px; }
-        h1 { margin: 0; font-size: 1.5rem; }
-        .tutorial-btn { position: absolute; right: 0; width: 30px; height: 30px; background: var(--accent); color: white; border-radius: 50%; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
+        .header-container {
+            display: flex;
+            flex-direction: column;   /* Stack title on top, buttons below */
+            align-items: center;      /* Center everything */
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 10px;
+        }
+
+        .header-container h1 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+
+        /* Buttons container */
+        .header-buttons {
+            display: flex;
+            gap: 10px; /* space between buttons */
+        }
+
+        /* Buttons (reuse your styles but remove absolute positioning) */
+        .story-btn,.tutorial-btn,.turn-btn,.bonus-btn,.spade-btn {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
 
         /* Resources */
         .resource-bar {
@@ -220,8 +250,16 @@
 
     <div class="header-container">
         <h1>Wild West Flip - A Fliptown mini-adaptation</h1>
-        <button class="tutorial-btn" onclick="openTutorial()">?</button>
+
+        <div class="header-buttons">
+            <button class="story-btn" onclick="openStory()">📖</button>
+            <button class="tutorial-btn" onclick="openTutorial()">❓</button>
+            <button class="turn-btn" onclick="openTurn()">▶️</button>
+            <button class="bonus-btn" onclick="openTurn()">🔗</button>
+            <button class="spade-btn" onclick="openTurn()">♠️</button>
+        </div>
     </div>
+
     
     <div class="resource-bar">
         <div class="res-item">💵 <span id="resMoney">2</span></div>
@@ -328,19 +366,118 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- STORY -->
+    <div class="overlay" id="storyOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>Game Objective</h2>
+            <p><b>Wild West Flip</b> is a flip and write game setting in the Wild West. Players are Cowboys that want to score the highest reputation (⭐) by visiting the trail stops (♥️), robbing in the badlands (♠️), digging in the mine (♦️), and visiting the town buildings (♣️) while avoiding arrest from The Sheriff (👮).</p>
+            <button class="close-modal-btn" onclick="closeStory()">&times;</button>
+        </div>
+    </div>
+
     <!-- TUTORIAL -->
     <div class="overlay" id="tutorialOverlay">
         <div class="overlay-content tutorial-content">
+            <h2>General Rule and Gameplay</h2>
+            <p>The game uses a 24 playing cards deck, ranging from A to 6 for each suit (♥️,♠️,♦️,♣️)</p>
+            <p>Basic resources in this game are as follows: Money 💵, Gold 🪙, Star ⭐, Wanted Level 🚨</p>
+            <p>The game consist of 5 turns. In each turn, the game will deal you three cards from the deck.</p>
+            <p>Before the turns start, the game will set aside 1 card, which will be called "The Sheriff card"</p>
+            <p>Details for the steps in each turn can be found in the "Turn Structure" help button.</p>
+            <p>After 5 turns, the game will decide whether the Sheriff will arrest you or not, comparing the "The Sheriff card" and/or Sheriff Roll</p>
+            <p>The game will also evaluate your poker hand, with each card you reserve in each round forming a 5 card lineup. You will earn Money 💵 and Star ⭐. See "Poker Hand Evaluation" for more details.</p>
+            <p>Your score will be evaluated based on the total Stars ⭐ you collected, leftover Money 💵 and Gold 🪙, and the penalty from the arrest (if you are arrested).</p>
+            <p>The highest score wins! Gain reputation in the Wild West and avoid the Sheriff attention. Good luck cowboys!</p>
             <button class="close-modal-btn" onclick="closeTutorial()">&times;</button>
-            <h2>How To Play</h2>
-            <p><b>Robbery (♠):</b> Draw check card. Gun adds +2. Bandana reduces Wanted gain by 1.</p>
-            <p><b>Trail (♥):</b> Horse adds +3 range. Skips cross out lower numbers.</p>
-            <p><b>Town (♣):</b> Visit buildings to buy gear or clear wanted levels. First visit grants bonus.</p>
-            <p><b>Mine (♦):</b> Pickaxe allows +/- 2 mod. Dig deeper levels. +1 Gold per visit + Chamber Bonus.</p>
-            <p><b>Banks:</b> Own Red/Black Bank? Get stars if start hand matches color.</p>
         </div>
     </div>
+
+        <div class="overlay" id="turnOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>Turn Structure</h2>
+            <p>In each turn, the game will deal you three cards from the deck.</p>
+            <p>Based on this 3 cards, you will assign each of them into a different role : Poker Card, Suit Card, and Number Card.</p>
+            <p><b>1. Poker Card: </b>You will not use this card in this turn. At the end 5 turns, all poker cards will form a 5 card lineup. The game will evaluate the lineup based on the quality of the lineup with Money 💵 and Star ⭐. See "Poker Hand Evaluation" for more details.</p>
+            <p><b>2. Suit Card: </b>Take the suit from the card. This will determine whether you will go to the Trail, Badlands, Mine, or Town.</p>
+            <p><b>3. Number Card: </b>Take the number from the card. This will determine the spot that you will visit in the location.</p>
+            <hr>
+            For example, you have the following 3 cards:
+            <div style="display:flex; justify-content:center; gap:10px; margin:10px 0;">
+                <div class="card">
+                    <div class="card-top">♠</div>
+                    <div class="card-center">4</div>
+                    <div class="card-bottom">♠</div>
+                </div>
+                <div class="card red">
+                    <div class="card-top">♥</div>
+                    <div class="card-center">2</div>
+                    <div class="card-bottom">♥</div>
+                </div>
+                <div class="card red">
+                    <div class="card-top">♦</div>
+                    <div class="card-center">5</div>
+                    <div class="card-bottom">♦</div>
+                </div>
+            </div>
+            You decide to assign:
+            <p><b>Poker Card:</b> ♦5 (set aside for poker hand)</p>
+            <p><b>Suit Card:</b> ♠4 (go to Badlands)</p>
+            <p><b>Number Card:</b> ♥2 (visit spot number 2)</p>
+            <p>This will make you visit the Badlands spot number 2.</p>
+            <button class="close-modal-btn" onclick="closeTurn()">&times;</button>
+        </div>
+    </div>
+
+        <!-- TUTORIAL -->
+    <div class="overlay" id="bonusOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>Bonus Actions</h2>
+            <p>Typically, you can only do 1 action in each turn. But if you gain a "Bonus Action" reward, you can do more!</p>
+            <p>Look for suits symbol (♥️,♠️,♦️,♣️) on each space, if visited, you will gain the bonus action after doing the number action.</p>
+            <p>If you gain a bonus action, you're not restricted by a number card. You can freely pick the spot from the Bonus Action.</p>
+            <hr>
+            <p>For example, you visit Trail spot number 2 (♥2), which gives you a bonus action of ♠️ (Badlands). After doing the Trail action, you can then do ANY NUMBER SPOT action in the Badlands. </p>
+            <hr>
+            <p>Make sure you plan your action accordingly, chaining actions can give you more rewards!</p>
+            <hr>
+            <p>NOTE : you can only visit any space once, except the TOWN BUILDINGS.</p>
+        </div>
+    </div>
+
+
+
+    <!-- TUTORIAL -->
+    <div class="overlay" id="spadeOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>Suit Actions - Badlands Robbery (♠️)</h2>
+            <p>This is your main spot for your money 💵 income.</p>
+            <p>Visiting the Badlands (♠️) allows you to perform a robbery at the selected spot number.</p>
+            <p>You will decide whether you will rob chicken 🐔 (A/2), cow 🐄 (3/4), or train 🚃 (5/6)</p>
+            <p>Each spot number has its own reward, which are money 💵 and star ⭐</p>
+            <p>Remember, because you are doing a crime here, you will always gain wanted level 🚨</p>
+            <p>Robbery is a risky business, you can SUCCEED, but you can also FAIL</p>
+        <hr>
+            <h2>How Robbery Works</h2>
+            <p>When you decide to rob, the game will check your robbery value (based on the spot number) against a random card draw.</p>
+            <p> If the drawn card value is MORE THAN OR EQUAL to your robbery value, you SUCCEED the robbery.</p>
+            <p> A successful robbery will give you all the rewards listed.</p>
+            <p> A failed robbery will give you all the wanted level, half the stars ⭐ (rounded down), and NO money</p>
+            <p>For example, you decide to rob a spot 3 cow 🐄, which has a robbery value of 3.</p>
+            <p>Then, the game will draw a card from the top of the deck, which in this case turned out to be:</p>
+            <div style="display:flex; justify-content:center; gap:10px; margin:10px 0;">
+                <div class="card">
+                    <div class="card-top">♣</div>
+                    <div class="card-center">2</div>
+                    <div class="card-bottom">♣</div>
+                </div>
+            </div>
+            <p></p>
+            <p>Since 2 (drawn card) is LESS THAN 3 (robbery value), you FAILED the robbery!</p>
+            <p>If only you succeed, You will gain 🚨2 💵1 ⭐2 </p>
+            <p>Since you failed, you will gain 🚨2 💵0 ⭐1 </p>
+        </div>
+</div>
 
 <script>
     /* --- CONFIG --- */
@@ -1048,7 +1185,7 @@
                 let marked = markedActions['♠'].includes(v);
                 cell.className = `tracker-cell ${marked?'marked':''}`;
                 let info = SPADE_REWARDS[v];
-                let rtxt = `🤠${info.w} 💵${info.m} ⭐${info.s}`;
+                let rtxt = `🚨${info.w} 💵${info.m} ⭐${info.s}`;
                 cell.innerHTML = `<span class="cell-number">${(v===1)?'A':v}</span><span class="spade-rewards-text">${rtxt}</span><span class="mark-symbol">✓</span>`;
                 numsDiv.appendChild(cell);
             });
@@ -1218,6 +1355,14 @@
     function openResultOverlay() { document.getElementById('resultOverlay').style.display='flex'; }
     function closeTutorial() { document.getElementById('tutorialOverlay').style.display='none'; }
     function openTutorial() { document.getElementById('tutorialOverlay').style.display='flex'; }
+    function closeStory() { document.getElementById('storyOverlay').style.display='none'; }
+    function openStory() { document.getElementById('storyOverlay').style.display='flex'; }
+    function closeTurn() { document.getElementById('turnOverlay').style.display='none'; }
+    function openTurn() { document.getElementById('turnOverlay').style.display='flex'; }
+    function closeSpade() { document.getElementById('spadeOverlay').style.display='none'; }
+    function openSpade() { document.getElementById('spadeOverlay').style.display='flex'; }
+    function closeBonus() { document.getElementById('bonusOverlay').style.display='none'; }
+    function openBonus() { document.getElementById('bonusOverlay').style.display='flex'; }
 
     initGame();
 </script>
