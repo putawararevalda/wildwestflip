@@ -50,7 +50,7 @@
         }
 
         /* Buttons (reuse your styles but remove absolute positioning) */
-        .story-btn,.tutorial-btn,.turn-btn,.bonus-btn,.spade-btn,.heart-btn,.diamond-btn,.club-btn {
+        .story-btn,.tutorial-btn,.turn-btn,.bonus-btn,.spade-btn,.heart-btn,.diamond-btn,.club-btn,.equipment-btn {
             width: 30px;
             height: 30px;
             background: var(--accent);
@@ -260,6 +260,7 @@
             <button class="spade-btn" onclick="openSpade()">♠️</button>
             <button class="diamond-btn" onclick="openDiamond()">♦️</button>
             <button class="club-btn" onclick="openClub()">♣️</button>
+            <button class="equipment-btn" onclick="openEquipment()">🪛</button>
         </div>
     </div>
 
@@ -533,6 +534,29 @@
         </div>
     </div>
 
+    <!-- EQUIPMENT TUTORIAL -->
+    <div class="overlay" id="equipmentOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>The Equipments and Abilities</h2>
+            <p>Below you can find the explanation for each equipments and abilities, mainly gained from the MINE and TOWN BUILDINGS.</p>
+            <hr>
+            <h3>Gained from the Mine</h3>
+            <p><b>Hammer 🔨 :</b> Gain 2 💵 after 5 rounds.</p>
+            <p><b>Gold Pan 🥘 :</b> Gain 1 🪙 after 5 rounds.</p>
+            <hr>
+            <h3>Gained from the Town Buildings</h3>
+            <p><b>Trail horse 🐎 :</b> If obtained, you can have the chance to visit the number space (trail stop hearts action) equal to its card number + 3<p>
+            <p><b>Gun 🔫</b> : If obtained, + 2 to the number of the card that is used to check the robbery (spades action). </p>
+            <p><b>Bandana 🥷 :</b> If obtained, each time a robbery is happening, REDUCE wanted level by 1 to the user's wanted level</p>
+            <p><b>Pickaxe ⛏️ :  </b> With this item, the user can add or substract 2 from the number action in the diamonds</p>
+            <p><b>Red Bank 🟥🏦 : </b> With this item obtained, you are speculating for the color of the 3 cards drawn at the start of each turn, for the future turns. After it is obtained, in the future rounds, if all the three card suits is red (all diamonds, all hearts, or combination of those red suits), you immediately gain 2 star.</p>
+            <p><b>Black Bank ⬛🏦 </b>Similar to Red Bank, but with the black suits (spades and clubs).</p>
+            <hr>
+            <p>Equipment can only obtained once and permanent throughout the game.</p>
+            <button class="close-modal-btn" onclick="closeEquipment()">&times;</button>
+        </div>
+    </div>
+
 
 
 <script>
@@ -563,9 +587,9 @@
     ];
 
     const HEART_REWARDS = {
-        1: { type: 'star', val: 1, icon: '⭐' }, 2: { type: 'bonus', val: '♠', icon: '♠' },
-        3: { type: 'money', val: 6, icon: '💵' }, 4: { type: 'bonus', val: '♣', icon: '♣' },
-        5: { type: 'gold', val: 4, icon: '🪙' }, 6: { type: 'bonus', val: '♦', icon: '♦' }
+        1: { type: 'star', val: 1, icon: '1 ⭐' }, 2: { type: 'bonus', val: '♠', icon: '♠' },
+        3: { type: 'money', val: 6, icon: '6 💵' }, 4: { type: 'bonus', val: '♣', icon: '♣' },
+        5: { type: 'gold', val: 4, icon: '4 🪙' }, 6: { type: 'bonus', val: '♦', icon: '♦' }
     };
 
     const MINE_CHAMBERS = [
@@ -1187,9 +1211,9 @@
             row.appendChild(iconDiv);
             
             // Add Equipment Bar
-            if(suit === '♥') row.appendChild(createEquipBar([{icon:'🐎', val:tools.horse}]));
-            if(suit === '♦') row.appendChild(createEquipBar([{icon:'⛏️', val:tools.pickaxe}]));
-            if(suit === '♠') row.appendChild(createEquipBar([{icon:'🔫', val:tools.gun}, {icon:'🥷', val:tools.bandana}]));
+            if(suit === '♥') row.appendChild(createEquipBar([{icon:'🐎 (+3 in Trail)', val:tools.horse}]));
+            if(suit === '♦') row.appendChild(createEquipBar([{icon:'⛏️ (+/2) in Mine', val:tools.pickaxe}]));
+            if(suit === '♠') row.appendChild(createEquipBar([{icon:'🔫 (+2 power when checking robbery)', val:tools.gun}, {icon:'🥷 (-1 Wanted regardless)', val:tools.bandana}]));
 
             if(suit === '♠') renderSpadeRow(row);
             else if (suit === '♦') renderMine(row);
@@ -1425,6 +1449,8 @@
     function openClub() { document.getElementById('clubOverlay').style.display='flex'; }
     function closeBonus() { document.getElementById('bonusOverlay').style.display='none'; }
     function openBonus() { document.getElementById('bonusOverlay').style.display='flex'; }
+    function closeEquipment() { document.getElementById('equipmentOverlay').style.display='none'; }
+    function openEquipment() { document.getElementById('equipmentOverlay').style.display='flex'; }
     
 
     initGame();
