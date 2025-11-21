@@ -50,7 +50,7 @@
         }
 
         /* Buttons (reuse your styles but remove absolute positioning) */
-        .story-btn,.tutorial-btn,.turn-btn,.bonus-btn,.spade-btn {
+        .story-btn,.tutorial-btn,.turn-btn,.bonus-btn,.spade-btn,.heart-btn,.diamond-btn,.club-btn {
             width: 30px;
             height: 30px;
             background: var(--accent);
@@ -255,8 +255,11 @@
             <button class="story-btn" onclick="openStory()">📖</button>
             <button class="tutorial-btn" onclick="openTutorial()">❓</button>
             <button class="turn-btn" onclick="openTurn()">▶️</button>
-            <button class="bonus-btn" onclick="openTurn()">🔗</button>
-            <button class="spade-btn" onclick="openTurn()">♠️</button>
+            <button class="bonus-btn" onclick="openBonus()">🔗</button>
+            <button class="heart-btn" onclick="openHeart()">♥️</button>
+            <button class="spade-btn" onclick="openSpade()">♠️</button>
+            <button class="diamond-btn" onclick="openDiamond()">♦️</button>
+            <button class="club-btn" onclick="openClub()">♣️</button>
         </div>
     </div>
 
@@ -393,7 +396,7 @@
         </div>
     </div>
 
-        <div class="overlay" id="turnOverlay">
+    <div class="overlay" id="turnOverlay">
         <div class="overlay-content tutorial-content">
             <h2>Turn Structure</h2>
             <p>In each turn, the game will deal you three cards from the deck.</p>
@@ -429,7 +432,7 @@
         </div>
     </div>
 
-        <!-- TUTORIAL -->
+    <!-- BONUS ACTIONS -->
     <div class="overlay" id="bonusOverlay">
         <div class="overlay-content tutorial-content">
             <h2>Bonus Actions</h2>
@@ -442,15 +445,28 @@
             <p>Make sure you plan your action accordingly, chaining actions can give you more rewards!</p>
             <hr>
             <p>NOTE : you can only visit any space once, except the TOWN BUILDINGS.</p>
+            <button class="close-modal-btn" onclick="closeBonus()">&times;</button>
+        </div>
+    </div>
+
+    <!-- HEART TUTORIAL-->
+    <div class="overlay" id="heartOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>Heart Actions - Trail Stops (♥️)</h2>
+            <p>Embark on a journey to visit multiple trail stops, beware, you can't backtrack once you have passed them!</p>
+            <p>To visit a trail stop, you need to have a number bigger or equal to the spot number.</p>
+            <hr>
+            <p>For example : Your action is 4 of hearts. You can visit the trail stop number 1, 2, 3, or 4. If you choose to visit the spot number 2 to gain the spade bonus action, the 1 spot will be crossed and the 2 spot will be check marked.</p>
+            <p>In the future round, you can only go forward. Spot number 1 in the trail stop will not be available, and you can only visit the spot number 3 onwards.</p>
+            <button class="close-modal-btn" onclick="closeHeart()">&times;</button>
         </div>
     </div>
 
 
-
-    <!-- TUTORIAL -->
+    <!-- SPADE TUTORIAL -->
     <div class="overlay" id="spadeOverlay">
         <div class="overlay-content tutorial-content">
-            <h2>Suit Actions - Badlands Robbery (♠️)</h2>
+            <h2>Spade Actions - Badlands Robbery (♠️)</h2>
             <p>This is your main spot for your money 💵 income.</p>
             <p>Visiting the Badlands (♠️) allows you to perform a robbery at the selected spot number.</p>
             <p>You will decide whether you will rob chicken 🐔 (A/2), cow 🐄 (3/4), or train 🚃 (5/6)</p>
@@ -476,8 +492,48 @@
             <p>Since 2 (drawn card) is LESS THAN 3 (robbery value), you FAILED the robbery!</p>
             <p>If only you succeed, You will gain 🚨2 💵1 ⭐2 </p>
             <p>Since you failed, you will gain 🚨2 💵0 ⭐1 </p>
+            <button class="close-modal-btn" onclick="closeSpade()">&times;</button>
         </div>
-</div>
+    </div>
+
+    <!-- DIAMOND TUTORIAL -->
+    <div class="overlay" id="diamondOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>Diamond Actions - The Mine (♦️)</h2>
+            <p>This is your main spot for your gold 🪙 income.</p>
+            <p>Dig deep inside the mine! As you get inside a chamber, you can access the chambers lower and gain bonus actions!</p>
+            <p>The Mine consists of two Levels, Level 1 and Level 2. Level 1 consists of two chambers (left and right), and Level 2 consists of three chambers (left, middle, and right).</p>
+            <p>Each chamber is marked with number range that is required to visit it. Once you visit a chamber, you can access the lower chamber only if you have visited the top chamber.</p>
+            <hr>
+            <p>For example, you gain the diamond action number 2 (♦️2) this will give you the access to the Level 1 Left chamber (range of A to 3). Once you done with that action, chamber Level 2 Left and chamber Level 2 Middle can be accessed. Chamber Level 2 Right is still locked, unless you have unlocked the top level of it, which is the Level 1 Right Chamber.</p>
+            <hr>
+            <p>NOTE : On a rare case of a tie in the number, which makes you can visit multiple chambers, it's resolved so you can unlock the top chamber first. This is quite different from the original game concept, and will be fixed in the future patch.</p>
+            <button class="close-modal-btn" onclick="closeDiamond()">&times;</button>
+        </div>
+    </div>
+
+    <!-- CLUB TUTORIAL -->
+    <div class="overlay" id="clubOverlay">
+        <div class="overlay-content tutorial-content">
+            <h2>Club Actions - Town Buildings (♣️)</h2>
+            <p>Visit the town buildings to buy equipments, abilities, and even remove your wanted level!</p>
+            <p>Each of the town building, when visited, will give you BONUS ACTIONS! (AFTER the town building is resolved, will be updated in future patch).</p>
+            <hr>
+            <p>Here are the list of the town buildings and the things that you can do in each of them:</p>
+            <p><b>1 : The Bank (♥️)| </b> Choose either you want to buy the RED BANK (🟥🏦) or the BLACK BANK (⬛🏦) by paying 2 💵<p>
+            <p><b>2 : The Stable (⭐)| </b> Buy a Horse 🐎 by spending 2 💵</p>
+            <p><b>3 : General Store (♦️)| </b> Buy a Bandana 🥷, spend 1 💵 </p>
+            <p><b>4 : The Church (⭐)| </b> Remove 🚨 (-1💵/lvl), maximum spending of 4 💵 per visit.</p>
+            <p><b>5 : Tool Store (♠️)| </b> Buy a pickaxe ⛏️ with a cost of 1 💵</p>
+            <p><b>6 : Mamat Gun Shop (⭐)| </b> Purchase a gun 🔫 for 2 💵</p>
+            Explanation of each equipment and ability can be found in the "🪛" button.
+            <hr>
+            <p>NOTE : you can visit the TOWN BUILDINGS multiple times.</p>
+            <button class="close-modal-btn" onclick="closeClub()">&times;</button>
+        </div>
+    </div>
+
+
 
 <script>
     /* --- CONFIG --- */
@@ -499,7 +555,7 @@
 
     const SPADE_REWARDS = {
         1: { animal: '🐔', w:1, s:1, m:1 }, 2: { animal: '🐔', w:1, s:1, m:2 },
-        3: { animal: '🐄', w:2, s:2, m:1 }, 4: { animal: '🐄', w:2, s:3, m:3 },
+        3: { animal: '🐄', w:2, s:2, m:1 }, 4: { animal: '🐄', w:2, s:2, m:3 },
         5: { animal: '🚃', w:3, s:3, m:2 }, 6: { animal: '🚃', w:3, s:3, m:4 }
     };
     const SPADE_ROWS = [
@@ -1361,8 +1417,15 @@
     function openTurn() { document.getElementById('turnOverlay').style.display='flex'; }
     function closeSpade() { document.getElementById('spadeOverlay').style.display='none'; }
     function openSpade() { document.getElementById('spadeOverlay').style.display='flex'; }
+    function closeHeart() { document.getElementById('heartOverlay').style.display='none'; }
+    function openHeart() { document.getElementById('heartOverlay').style.display='flex'; }
+    function closeDiamond() { document.getElementById('diamondOverlay').style.display='none'; }
+    function openDiamond() { document.getElementById('diamondOverlay').style.display='flex'; }
+    function closeClub() { document.getElementById('clubOverlay').style.display='none'; }
+    function openClub() { document.getElementById('clubOverlay').style.display='flex'; }
     function closeBonus() { document.getElementById('bonusOverlay').style.display='none'; }
     function openBonus() { document.getElementById('bonusOverlay').style.display='flex'; }
+    
 
     initGame();
 </script>
