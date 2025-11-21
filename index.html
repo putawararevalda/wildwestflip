@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fliptown Adapted - MVP</title>
+    <title>Wild West Flip - A Fliptown mini-adaptation</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -86,43 +86,32 @@
         /* Toolbelt */
         .toolbelt-area {
             width: 100%; max-width: 600px; margin-bottom: 15px;
-            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 5px;
-            display: flex; justify-content: space-around;
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px;
+            display: flex; flex-direction: column; gap: 10px;
         }
+        .tool-row { display: flex; justify-content: space-around; width: 100%; }
         .tool-group { display: flex; align-items: center; gap: 5px; }
         .tool-icon { font-size: 1.5rem; }
         .tool-slots { display: flex; gap: 3px; }
         .tool-box { width: 15px; height: 15px; border: 1px solid #7f8c8d; border-radius: 2px; background: rgba(0,0,0,0.2); }
         .tool-box.filled { background: var(--success); border-color: var(--success); }
+        
+        /* Single Checkbox items */
+        .tool-check { 
+            width: 18px; height: 18px; border: 1px solid #7f8c8d; border-radius: 3px; 
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold;
+        }
+        .tool-check.owned { background: var(--success); color: white; border-color: var(--success); }
 
         /* --- TRACKER --- */
         .tracker-board { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-bottom: 20px; }
         
-        /* Updated: Column Layout for Header + Content */
-        .tracker-row { 
-            display: flex; 
-            flex-direction: column; /* Top-to-bottom */
-            background: rgba(255,255,255,0.05); 
-            border-radius: 8px; 
-            overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.1); 
-        }
-        
-        /* Updated Header Styling */
+        /* Header Style */
+        .tracker-row { display: flex; flex-direction: column; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
         .tracker-suit-icon {
-            width: 100%;
-            display: flex; 
-            flex-direction: row;
-            justify-content: center; 
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem; 
-            background: rgba(0,0,0,0.3); 
-            padding: 8px;
-            box-sizing: border-box;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px;
+            font-size: 1.5rem; background: rgba(0,0,0,0.3); padding: 8px; box-sizing: border-box; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        
         .tracker-suit-icon.red { color: var(--card-red); }
         .suit-name-label { font-size: 1rem; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: bold; color: #fff; opacity: 0.9; }
         
@@ -134,7 +123,7 @@
         .tracker-cell {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(255,255,255,0.1); border: 1px solid #7f8c8d;
-            border-radius: 4px; padding: 2px 6px; min-height: 40px; position: relative;
+            border-radius: 4px; padding: 2px 6px; min-height: 45px; position: relative;
         }
         .tracker-cell.marked { background-color: rgba(39, 174, 96, 0.2); border-color: var(--success); }
         .tracker-cell.crossed { background-color: rgba(192, 57, 43, 0.2); border-color: var(--danger); opacity: 0.6; }
@@ -146,9 +135,10 @@
         .bonus-indicator.red { color: var(--card-red); }
         
         .spade-rewards-text { font-size: 0.6rem; margin-left: 5px; color: #bdc3c7; line-height: 0.9; }
+        .club-rewards-text { font-size: 0.65rem; margin-left: 5px; color: var(--gold); font-weight: normal; }
 
         /* Spade Layout */
-        .spade-container { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .spade-container { flex: 1; padding: 5px; display: flex; flex-direction: column; gap: 5px; }
         .spade-row-group { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 4px; }
         .spade-animal { font-size: 1.5rem; margin-right: 10px; width: 30px; text-align: center; }
         .spade-numbers { display: flex; gap: 5px; flex: 1; }
@@ -157,17 +147,17 @@
         .claimed { opacity: 0.3; }
 
         /* Mine Layout */
-        .mine-container { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 5px; align-items: center; }
+        .mine-container { flex: 1; padding: 5px; display: flex; flex-direction: column; gap: 5px; align-items: center; }
         .mine-level { display: flex; gap: 10px; }
         .mine-chamber {
-            width: 80px; height: 55px; background: var(--mine-bg); border: 2px solid #7f8c8d; border-radius: 6px;
+            width: 90px; height: 65px; background: var(--mine-bg); border: 2px solid #7f8c8d; border-radius: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
         }
         .mine-chamber.marked { background: var(--success); border-color: #2ecc71; }
         .mine-chamber.locked { opacity: 0.4; border-style: dashed; }
-        .chamber-label { font-size: 0.6rem; font-weight: bold; }
+        .chamber-label { font-size: 0.6rem; font-weight: bold; margin-bottom: 2px; }
         .chamber-req { font-size: 0.9rem; font-weight: bold; color: #fff; background: rgba(0,0,0,0.3); padding: 0 4px; border-radius: 3px; margin-bottom: 2px; }
-        .chamber-icon { font-size: 0.8rem; display: flex; gap: 3px; }
+        .mine-rewards { display: flex; gap: 4px; font-size: 1.1rem; }
         .mine-reward-icon.red { color: var(--card-red); }
 
         /* Buttons */
@@ -183,38 +173,36 @@
         .bottom-controls { display: flex; gap: 10px; margin-top: 10px; }
         
         /* Overlays */
-        .overlay {
-            position: fixed; top:0; left:0; right:0; bottom:0;
-            background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 100; display: none;
-        }
-        .overlay-content {
-            background: #ecf0f1; color: #2c3e50; padding: 20px; border-radius: 10px;
-            text-align: center; max-width: 400px; width: 95%; max-height: 90vh; overflow-y: auto; position: relative;
-        }
+        .overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 100; display: none; }
+        .overlay-content { background: #ecf0f1; color: #2c3e50; padding: 20px; border-radius: 10px; text-align: center; max-width: 400px; width: 95%; max-height: 90vh; overflow-y: auto; position: relative; }
         
         .robbery-card-display {
             margin: 15px auto; width: 80px; height: 112px; 
             background: white; border-radius: 8px; color: black;
             display: flex; flex-direction: column; justify-content: space-between; padding: 5px;
-            font-size: 1.2rem; font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         .robbery-card-display.red { color: var(--card-red); }
 
+        /* Final Display */
         .wanted-result { font-size: 1.5rem; font-weight: bold; margin-top: 10px; padding: 5px; border-radius: 5px; color: white; display:none; }
         .wanted-result.show { display:block; }
         .arrested { background-color: var(--danger); }
         .safe { background-color: var(--success); }
+        
+        /* Cards in Final */
+        .final-card-mini { 
+            font-size: 1.5rem; background: #fff; padding: 5px; border-radius: 5px; border: 1px solid #ccc; width: 40px; transition: transform 0.5s; color: var(--card-black);
+        }
+        .final-card-mini.red { color: var(--card-red); border-color: var(--card-red); }
 
         .log-area { margin-top: 10px; width: 100%; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 5px; font-family: monospace; height: 80px; overflow-y: auto; text-align: left; font-size: 0.8rem; }
         .dice-container { width: 50px; height: 50px; background: #fff; border: 2px solid #333; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; font-weight: bold; color: #c0392b; margin: 0 auto; }
         .rolling { animation: shake 0.1s infinite; background-color: #f1c40f; }
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
         .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; background: none; border: none; color: #7f8c8d; }
-        
         .choice-btn { background: #8e44ad; margin: 5px 0; padding: 15px; text-align: left; width: 100%; }
         .choice-btn:hover { background: #9b59b6; }
-        
         .score-table { width: 100%; margin-top: 15px; border-collapse: collapse; }
         .score-table td { padding: 5px; border-bottom: 1px solid #bdc3c7; text-align: left; }
         .score-table td:last-child { text-align: right; font-weight: bold; }
@@ -223,7 +211,7 @@
 <body>
 
     <div class="header-container">
-        <h1>Wild West Flip</h1>
+        <h1>Wild West Flip - A Fliptown mini-adaptation</h1>
         <button class="tutorial-btn" onclick="openTutorial()">?</button>
     </div>
     
@@ -256,8 +244,18 @@
 
     <div class="game-board">
         <div class="toolbelt-area">
-            <div class="tool-group"><div class="tool-icon">🔨</div><div class="tool-slots" id="hammerSlots"></div></div>
-            <div class="tool-group"><div class="tool-icon">🥘</div><div class="tool-slots" id="panSlots"></div></div>
+            <div class="tool-row">
+                <div class="tool-group"><div class="tool-icon">🔨</div><div class="tool-slots" id="hammerSlots"></div></div>
+                <div class="tool-group"><div class="tool-icon">🥘</div><div class="tool-slots" id="panSlots"></div></div>
+            </div>
+            <div class="tool-row">
+                <div class="tool-group"><div class="tool-icon">🐎</div><div id="horseCheck"></div></div>
+                <div class="tool-group"><div class="tool-icon">🔫</div><div id="gunCheck"></div></div>
+                <div class="tool-group"><div class="tool-icon">🥷</div><div id="bandanaCheck"></div></div>
+                <div class="tool-group"><div class="tool-icon">⛏️</div><div id="pickaxeCheck"></div></div>
+                <div class="tool-group"><div class="tool-icon">🟥🏦</div><div id="redBankCheck"></div></div>
+                <div class="tool-group"><div class="tool-icon">⬛🏦</div><div id="blackBankCheck"></div></div>
+            </div>
         </div>
 
         <div class="instructions" id="instructionText">Press Start Turn</div>
@@ -290,6 +288,7 @@
             <h2>Robbery Check!</h2>
             <p>Target: <b id="robberyTargetName"></b> (Value <span id="robberyTargetVal"></span>+)</p>
             <div id="robberyCardDisplay" class="robbery-card-display"></div>
+            <div id="robberyModifierText" style="font-size:0.8rem; color:#e67e22; margin-top:5px;"></div>
             <h3 id="robberyResultTitle"></h3>
             <p id="robberyResultText"></p>
             <button onclick="continueFromRobbery()">Continue</button>
@@ -304,7 +303,6 @@
                 <div id="finalPokerHandVisual" style="display:flex; gap:5px;"></div>
             </div>
             <p><b><span id="finalPokerTitle"></span></b></p>
-            
             <div class="wanted-section">
                 <h3>ARREST CHECK</h3>
                 <div id="overlayStatusText" style="font-style:italic; margin-bottom:5px;"></div>
@@ -315,12 +313,9 @@
                 </div>
                 <div id="overlayArrestResult" class="wanted-result"></div>
             </div>
-
             <div id="finalScoreDisplay"></div>
-            <!-- Added containers -->
             <div id="pokerRewardText" style="margin-top:8px;"></div>
             <div id="scoreSection" style="display:none;"></div>
-
             <div style="margin-top:15px; display:flex; gap:10px;">
                 <button class="btn-secondary" onclick="document.getElementById('resultOverlay').style.display='none'">View Board</button>
                 <button onclick="restartGame()">Play Again</button>
@@ -333,17 +328,18 @@
         <div class="overlay-content tutorial-content">
             <button class="close-modal-btn" onclick="closeTutorial()">&times;</button>
             <h2>How To Play</h2>
-            <p><b>Robbery (♠):</b> Draw check card. Value >= Slot = Success. Always marks slot.</p>
-            <p><b>Trail (♥):</b> Select a spot up to Card Value. Skips lower numbers.</p>
-            <p><b>Town (♣):</b> Can be visited multiple times.</p>
-            <p><b>Mine (♦):</b> Dig deeper levels. +1 Gold per visit + Chamber Bonus.</p>
-            <p><b>Grave (💀):</b> Visit once per game (1-4). +1 Wanted, +1 Money. Use if stuck.</p>
+            <p><b>Robbery (♠):</b> Draw check card. Gun adds +2. Bandana reduces Wanted gain by 1.</p>
+            <p><b>Trail (♥):</b> Horse adds +3 range. Skips cross out lower numbers.</p>
+            <p><b>Town (♣):</b> Visit buildings to buy gear or clear wanted levels. First visit grants bonus.</p>
+            <p><b>Mine (♦):</b> Pickaxe allows +/- 2 mod. Dig deeper levels. +1 Gold per visit + Chamber Bonus.</p>
+            <p><b>Banks:</b> Own Red/Black Bank? Get stars if start hand matches color.</p>
         </div>
     </div>
 
 <script>
     /* --- CONFIG --- */
     const SUITS = ['♠', '♥', '♣', '♦'];
+    const BOARD_SECTIONS = ['♠', '♥', '♣', '♦', '💀'];
     const RANKS = ['A', '2', '3', '4', '5', '6']; 
     const VALUES = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6};
     
@@ -352,30 +348,22 @@
         '♥': [1, 2, 3, 4, 5, 6],
         '♣': [1, 2, 3, 4, 5, 6],
         '♦': [],
-        '💀': [1, 2, 3, 4] // 4 Graves
+        '💀': [1, 2, 3, 4]
     };
 
     const SPADE_REWARDS = {
-        1: { animal: '🐔', w:1, s:1, m:1 },
-        2: { animal: '🐔', w:1, s:1, m:2 },
-        3: { animal: '🐄', w:2, s:2, m:1 },
-        4: { animal: '🐄', w:2, s:3, m:3 },
-        5: { animal: '🚃', w:3, s:3, m:2 },
-        6: { animal: '🚃', w:3, s:3, m:4 }
+        1: { animal: '🐔', w:1, s:1, m:1 }, 2: { animal: '🐔', w:1, s:1, m:2 },
+        3: { animal: '🐄', w:2, s:2, m:1 }, 4: { animal: '🐄', w:2, s:3, m:3 },
+        5: { animal: '🚃', w:3, s:3, m:2 }, 6: { animal: '🚃', w:3, s:3, m:4 }
     };
     const SPADE_ROWS = [
-        { ranks: [1, 2], reward: '♦' },
-        { ranks: [3, 4], reward: '♣' },
-        { ranks: [5, 6], reward: '♥' }
+        { ranks: [1, 2], reward: '♦' }, { ranks: [3, 4], reward: '♣' }, { ranks: [5, 6], reward: '♥' }
     ];
 
     const HEART_REWARDS = {
-        1: { type: 'star', val: 1, icon: '⭐' },
-        2: { type: 'bonus', val: '♠', icon: '♠' },
-        3: { type: 'money', val: 6, icon: '💵' },
-        4: { type: 'bonus', val: '♣', icon: '♣' },
-        5: { type: 'gold', val: 4, icon: '🪙' },
-        6: { type: 'bonus', val: '♦', icon: '♦' }
+        1: { type: 'star', val: 1, icon: '⭐' }, 2: { type: 'bonus', val: '♠', icon: '♠' },
+        3: { type: 'money', val: 6, icon: '💵' }, 4: { type: 'bonus', val: '♣', icon: '♣' },
+        5: { type: 'gold', val: 4, icon: '🪙' }, 6: { type: 'bonus', val: '♦', icon: '♦' }
     };
 
     const MINE_CHAMBERS = [
@@ -385,17 +373,20 @@
         { id: 'L2_M', level: 2, label: 'L2 Mid', req: '3-4', values: [3,4], parent: 'MIXED', reward: '♥' }, 
         { id: 'L2_R', level: 2, label: 'L2 Right', req: '5-6', values: [5,6], parent: 'L1_R', reward: '♣' }
     ];
+
+    const CLUB_INFO = {
+        1: { bonus: '♥', desc: 'Bonus: ♥ | 🟥🏦 or ⬛🏦 (-2💵)' },
+        2: { bonus: '⭐', desc: 'Bonus: ⭐ | 🐎 (-2💵)' },
+        3: { bonus: '♦', desc: 'Bonus: ♦ | 🥷 (-1💵)' },
+        4: { bonus: '⭐', desc: 'Bonus: ⭐ | Remove 🚨 (-1💵/lvl)' },
+        5: { bonus: '♠', desc: 'Bonus: ♠ | ⛏️ (-1💵)' },
+        6: { bonus: '⭐', desc: 'Bonus: ⭐ | 🔫 (-2💵)' }
+    };
     
     const POKER_REWARDS = {
-        "Straight Flush": {money: 9, star: 8},
-        "Four of a Kind": {money: 8, star: 7},
-        "Full House":     {money: 7, star: 6},
-        "Flush":          {money: 6, star: 5},
-        "Straight":       {money: 5, star: 4},
-        "Three of a Kind":{money: 4, star: 3},
-        "Two Pair":       {money: 3, star: 2},
-        "One Pair":       {money: 2, star: 1},
-        "High Card":      {money: 0, star: 0}
+        "Straight Flush": {money: 9, star: 8}, "Four of a Kind": {money: 8, star: 7}, "Full House": {money: 7, star: 6},
+        "Flush": {money: 6, star: 5}, "Straight": {money: 5, star: 4}, "Three of a Kind":{money: 4, star: 3},
+        "Two Pair": {money: 3, star: 2}, "One Pair": {money: 2, star: 1}, "High Card": {money: 0, star: 0}
     };
 
     /* --- STATE --- */
@@ -406,9 +397,10 @@
     let markedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
     let crossedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
     let markedMines = [], claimedSpadeRows = [];
+    let clubVisits = []; // Tracks [1, 2, 6] which buildings visited
     
     let resources = { money: 2, gold: 2, star: 0, wanted: 0 };
-    let tools = { hammers: 0, pans: 0 };
+    let tools = { hammers: 0, pans: 0, horse:0, gun:0, bandana:0, pickaxe:0, redBank:0, blackBank:0 };
     
     let pendingBonusSuit = null;
     let robberyCallback = null; 
@@ -419,15 +411,15 @@
         discardPile = []; savedPokerCards = []; currentHand = [];
         markedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
         crossedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
-        markedMines = []; claimedSpadeRows = [];
-        pendingBonusSuit = null; robberyCallback = null;
-        lastDiscard = null;
+        markedMines = []; claimedSpadeRows = []; clubVisits = [];
+        pendingBonusSuit = null; robberyCallback = null; lastDiscard = null;
 
         resources = { money: 2, gold: 2, star: 0, wanted: 0 };
-        tools = { hammers: 0, pans: 0 };
-        gameEnded = false; finalSheriffRoll = -1;
+        tools = { hammers: 0, pans: 0, horse:0, gun:0, bandana:0, pickaxe:0, redBank:0, blackBank:0 };
         
+        gameEnded = false; finalSheriffRoll = -1;
         hiddenCard = deck.pop();
+        
         updateUI();
         log("New game started.");
         
@@ -441,8 +433,8 @@
         document.getElementById('choiceInputArea').style.display = 'none';
         document.getElementById('bonusInputArea').style.display = 'none';
         document.getElementById('instructionText').innerText = "Press Start Turn";
-        document.getElementById('hiddenCardSlot').innerHTML = "?";
         document.getElementById('hiddenCardSlot').className = "mini-card card-back";
+        document.getElementById('hiddenCardSlot').innerText = "?";
     }
 
     function createDeck() {
@@ -485,20 +477,35 @@
             discSlot.innerText = "-";
         }
 
-        renderTools('hammerSlots', tools.hammers);
-        renderTools('panSlots', tools.pans);
+        renderTools();
         renderDashboard();
         renderTracker();
     }
 
-    function renderTools(id, count) {
-        const el = document.getElementById(id);
-        el.innerHTML = '';
+    function renderTools() {
+        const hamDiv = document.getElementById('hammerSlots');
+        hamDiv.innerHTML = '';
         for(let i=0; i<4; i++) {
-            let d = document.createElement('div');
-            d.className = `tool-box ${i<count ? 'filled':''}`;
-            el.appendChild(d);
+            let d = document.createElement('div'); d.className = `tool-box ${i<tools.hammers ? 'filled':''}`; hamDiv.appendChild(d);
         }
+        const panDiv = document.getElementById('panSlots');
+        panDiv.innerHTML = '';
+        for(let i=0; i<4; i++) {
+            let d = document.createElement('div'); d.className = `tool-box ${i<tools.pans ? 'filled':''}`; panDiv.appendChild(d);
+        }
+        
+        setToolCheck('horseCheck', tools.horse);
+        setToolCheck('gunCheck', tools.gun);
+        setToolCheck('bandanaCheck', tools.bandana);
+        setToolCheck('pickaxeCheck', tools.pickaxe);
+        setToolCheck('redBankCheck', tools.redBank);
+        setToolCheck('blackBankCheck', tools.blackBank);
+    }
+    
+    function setToolCheck(id, val) {
+        let d = document.getElementById(id);
+        d.className = `tool-check ${val?'owned':''}`;
+        d.innerHTML = val ? '✓' : '';
     }
     
     function renderDashboard() {
@@ -529,8 +536,18 @@
         document.getElementById('actionArea').innerHTML = '';
         document.getElementById('actionArea').style.display = 'none';
         pokerCardIndex = -1;
+        
         currentHand = [drawCard(), drawCard(), drawCard()].filter(c => c);
         if(currentHand.length < 3) { log("Error: Not enough cards."); return; }
+        
+        // Bank Check
+        if(tools.redBank) {
+            if(currentHand.every(c => c.color === 'red')) { resources.star += 2; log("Red Bank: +2 Stars!"); updateUI(); }
+        }
+        if(tools.blackBank) {
+            if(currentHand.every(c => c.color === 'black')) { resources.star += 2; log("Black Bank: +2 Stars!"); updateUI(); }
+        }
+
         gamePhase = 'SELECT_POKER';
         renderHand();
         document.getElementById('instructionText').innerText = "Select a Poker Card";
@@ -599,11 +616,7 @@
         if(suitCard.suit === '♦') {
             if(getValidMineTargets(valCard.value).length === 0) { invalid = true; reason = "(Blocked)"; }
         }
-        if(suitCard.suit === '♥') {
-            let opts = [1,2,3,4,5,6].filter(v => v <= valCard.value && !markedActions['♥'].includes(v) && !crossedActions['♥'].includes(v));
-            if(opts.length === 0) { invalid = true; reason = "(Full)"; }
-        }
-
+        
         btn.innerHTML = `<span><b>${valCard.rank}</b> as Value, <b>${suitCard.suit}</b> as Suit</span><span>${reason}</span>`;
         if(invalid) btn.disabled = true;
         else btn.onclick = () => executeTurn(valCard.value, suitCard.suit);
@@ -641,6 +654,7 @@
         if(suit === '♠') handleSpadeAction(val, callback); 
         else if(suit === '♦') handleDiamondAction(val, callback); 
         else if(suit === '♥') handleHeartAction(val, callback);
+        else if(suit === '♣') handleClubAction(val, callback);
         else { applyMark(val, suit); callback(); }
     }
 
@@ -653,7 +667,10 @@
         discardPile.push(checkCard);
         lastDiscard = checkCard;
 
-        let success = checkCard.value >= val;
+        let checkVal = checkCard.value;
+        if(tools.gun) checkVal += 2;
+
+        let success = checkVal >= val;
         let info = SPADE_REWARDS[val];
         
         let overlay = document.getElementById('robberyOverlay');
@@ -663,20 +680,25 @@
         disp.className = `robbery-card-display ${checkCard.color}`;
         disp.innerHTML = `<div>${checkCard.rank}${checkCard.suit}</div><div style="font-size:2rem">${checkCard.suit}</div><div style="transform:rotate(180deg)">${checkCard.rank}${checkCard.suit}</div>`;
         
+        let modText = document.getElementById('robberyModifierText');
+        modText.innerText = tools.gun ? `Gun +2 applied. Check Value: ${checkVal}` : `Check Value: ${checkVal}`;
+
         let title = document.getElementById('robberyResultTitle');
         let text = document.getElementById('robberyResultText');
-        resources.wanted += info.w; 
+        
+        let wGain = Math.max(0, info.w - (tools.bandana ? 1 : 0));
+        resources.wanted += wGain;
         
         if(success) {
             title.innerText = "SUCCESS!";
             title.style.color = "var(--success)";
-            text.innerText = `Success! +${info.m} Money, +${info.s} Stars, +${info.w} Wanted.`;
+            text.innerText = `Success! +${info.m} Money, +${info.s} Stars, +${wGain} Wanted.`;
             resources.money += info.m; resources.star += info.s;
         } else {
             title.innerText = "FAILED!";
             title.style.color = "var(--danger)";
             let halfStars = Math.floor(info.s / 2);
-            text.innerText = `Failed! No Money, +${halfStars} Stars, +${info.w} Wanted.`;
+            text.innerText = `Failed! No Money, +${halfStars} Stars, +${wGain} Wanted.`;
             resources.star += halfStars;
         }
         
@@ -705,12 +727,52 @@
 
     /* --- DIAMOND LOGIC (MINE) --- */
     function handleDiamondAction(val, callback) {
+        let baseVal = val;
+        if(tools.pickaxe) {
+            let options = [];
+            let vMinus = val - 2;
+            let vPlus = val + 2;
+            
+            // Collect potential targets for base, base-2, base+2
+            let tBase = getValidMineTargets(baseVal);
+            if(tBase.length > 0) options.push({val: baseVal, label: `Keep ${baseVal}`});
+            
+            if(vMinus >= 1) {
+                let tMinus = getValidMineTargets(vMinus);
+                if(tMinus.length > 0) options.push({val: vMinus, label: `Pickaxe (-2) -> ${vMinus}`});
+            }
+            
+            if(vPlus <= 6) {
+                let tPlus = getValidMineTargets(vPlus);
+                if(tPlus.length > 0) options.push({val: vPlus, label: `Pickaxe (+2) -> ${vPlus}`});
+            }
+
+            if(options.length > 1) {
+                showChoice(options, (choiceVal) => {
+                    // Now process choiceVal
+                    processDiamondValue(choiceVal, callback);
+                }, '♦ Pickaxe');
+                return;
+            } else if (options.length === 1) {
+                processDiamondValue(options[0].val, callback);
+                return;
+            } else {
+                log("No valid mine target (even with pickaxe).");
+                callback();
+                return;
+            }
+        } else {
+            processDiamondValue(val, callback);
+        }
+    }
+
+    function processDiamondValue(val, callback) {
         let targets = getValidMineTargets(val);
         if(targets.length === 1) { fillMineChamber(targets[0]); callback(); } 
         else if(targets.length > 1) {
             showChoice(targets.map(t => ({val: t, label: MINE_CHAMBERS.find(m=>m.id===t).label})), (choice) => {
                 fillMineChamber(choice); callback();
-            }, '♦');
+            }, '♦ Chamber');
         } else { log("No valid mine target."); callback(); }
     }
 
@@ -735,18 +797,17 @@
         updateUI();
     }
 
-    function getRewardIcon(r) {
-        if(r==='hammer') return '🔨'; if(r==='pan') return '🥘'; return r;
-    }
-
     /* --- HEART LOGIC --- */
     function handleHeartAction(val, callback) {
-        let options = [1,2,3,4,5,6].filter(v => v <= val && !markedActions['♥'].includes(v) && !crossedActions['♥'].includes(v));
+        let maxVal = val;
+        if(tools.horse) maxVal += 3;
+        
+        let options = [1,2,3,4,5,6].filter(v => v <= maxVal && !markedActions['♥'].includes(v) && !crossedActions['♥'].includes(v));
         
         if(options.length > 1) {
             showChoice(options.map(v => ({val: v, label: `Stop at ${v} (${HEART_REWARDS[v].type})`})), (choice) => {
                 applyHeart(choice); callback();
-            }, '♥');
+            }, '♥ Trail');
         } else if(options.length === 1) {
             applyHeart(options[0]); callback();
         } else {
@@ -768,6 +829,69 @@
         updateUI();
     }
 
+    /* --- CLUB (TOWN) LOGIC --- */
+    function handleClubAction(val, callback) {
+        // Define shop options based on val
+        let options = [];
+        
+        // First Visit Bonus Logic happens AFTER shop interaction
+        let firstVisit = !clubVisits.includes(val);
+        
+        // Helper to wrap callback with bonus check
+        const finishClub = () => {
+            if(firstVisit) {
+                clubVisits.push(val);
+                let info = CLUB_INFO[val];
+                if(['♥','♦','♠'].includes(info.bonus)) {
+                    pendingBonusSuit = info.bonus;
+                    log(`First visit bonus: Free ${info.bonus} action!`);
+                } else if (info.bonus === '⭐') {
+                    resources.star += 1;
+                    log(`First visit bonus: +1 Star`);
+                }
+            }
+            if(!markedActions['♣'].includes(val)) markedActions['♣'].push(val);
+            updateUI();
+            callback();
+        };
+
+        if(val === 1) { // Banks
+            if(resources.money >= 2 && !tools.redBank) options.push({val: 'red', label: 'Buy Red Bank ($2)'});
+            if(resources.money >= 2 && !tools.blackBank) options.push({val: 'black', label: 'Buy Black Bank ($2)'});
+        } 
+        else if (val === 2) { if(resources.money >= 2 && !tools.horse) options.push({val: 'buy', label: 'Buy Horse ($2)'}); }
+        else if (val === 3) { if(resources.money >= 1 && !tools.bandana) options.push({val: 'buy', label: 'Buy Bandana ($1)'}); }
+        else if (val === 5) { if(resources.money >= 1 && !tools.pickaxe) options.push({val: 'buy', label: 'Buy Pickaxe ($1)'}); }
+        else if (val === 6) { if(resources.money >= 2 && !tools.gun) options.push({val: 'buy', label: 'Buy Gun ($2)'}); }
+        else if (val === 4) { // Sheriff Office
+            if(resources.money >= 1 && resources.wanted > 0) {
+                let maxPay = Math.min(4, resources.wanted, resources.money);
+                for(let i=1; i<=maxPay; i++) options.push({val: i, label: `Remove ${i} Wanted ($${i})`});
+            }
+        }
+
+        options.push({val: 'skip', label: 'Do Nothing (Visit)'});
+
+        showChoice(options, (choice) => {
+            if(choice === 'skip') { /* Do nothing */ }
+            else if(val === 1) {
+                resources.money -= 2;
+                if(choice === 'red') tools.redBank = 1; else tools.blackBank = 1;
+                log("Bought Bank!");
+            }
+            else if(val === 2) { resources.money -= 2; tools.horse = 1; log("Bought Horse!"); }
+            else if(val === 3) { resources.money -= 1; tools.bandana = 1; log("Bought Bandana!"); }
+            else if(val === 5) { resources.money -= 1; tools.pickaxe = 1; log("Bought Pickaxe!"); }
+            else if(val === 6) { resources.money -= 2; tools.gun = 1; log("Bought Gun!"); }
+            else if(val === 4) { 
+                resources.money -= choice; 
+                resources.wanted -= choice; 
+                log(`Paid $${choice} to remove ${choice} Wanted.`);
+            }
+            finishClub();
+        }, '♣ Shop');
+    }
+
     /* --- GENERIC --- */
     function applyMark(val, suit) {
         if(!markedActions[suit].includes(val)) markedActions[suit].push(val);
@@ -781,42 +905,31 @@
         } else {
             updateUI();
             if(savedPokerCards.length >= 5) {
-                // Auto-evaluate end of game and reveal hidden card immediately.
                 document.getElementById('mainBtn').style.display = 'none';
                 document.getElementById('endGameBtn').style.display = 'block';
-                document.getElementById('instructionText').innerText = "Game Over. Checking Sheriff...";
-                try {
-                    // The button is shown, but we don't auto run it anymore to let user click it as per previous request? 
-                    // Wait, user said "add a button that needs to be clicked".
-                    // So we just show the button.
-                } catch(e) {
-                    console.error('Error during endGameEvaluation:', e);
-                }
+                document.getElementById('instructionText').innerText = "Game Over. Check Sheriff.";
             } else {
                 document.getElementById('mainBtn').style.display = 'block';
-                document.getElementById('mainBtn').innerText = 'Start Next Turn';
-                document.getElementById('instructionText').innerText = 'Turn Complete.';
+                document.getElementById('mainBtn').innerText = "Start Next Turn";
+                document.getElementById('instructionText').innerText = "Turn Complete.";
                 gamePhase = 'IDLE';
             }
         }
     }
 
     function showBonusInput() {
-        // FILTER VALID TARGETS FOR BONUS
         let suit = pendingBonusSuit;
         let validOptions = [];
         
         if(suit === '♦') {
-            // For diamond bonus, we find all valid mine targets
             [1,2,3,4,5,6].forEach(v => { if(getValidMineTargets(v).length > 0) validOptions.push(v); });
         } else if(suit === '♥') {
-             // Filter heart stops
              [1,2,3,4,5,6].forEach(v => {
                  if(!markedActions['♥'].includes(v) && !crossedActions['♥'].includes(v)) validOptions.push(v);
              });
         } else if (suit === '♣') {
              validOptions = [1,2,3,4,5,6];
-        } else { // Spades
+        } else { 
              [1,2,3,4,5,6].forEach(v => { if(!markedActions[suit].includes(v)) validOptions.push(v); });
         }
 
@@ -827,27 +940,13 @@
             return;
         }
 
-        const area = document.getElementById('choiceInputArea'); // Reuse generic
-        const container = document.getElementById('choiceButtons');
-        document.getElementById('choiceLabel').innerText = suit;
-        container.innerHTML = '';
-        
-        validOptions.forEach(v => {
-            let b = document.createElement('button');
-            b.className = 'choice-btn';
-            b.innerText = (v===1)?'A':v;
-            b.style.width = "40px"; 
-            b.style.display = "inline-block";
-            b.style.margin = "5px";
-            b.onclick = () => {
-                area.style.display = 'none';
-                let s = pendingBonusSuit;
-                pendingBonusSuit = null;
-                triggerAction(v, s, checkTurnEnd);
-            };
-            container.appendChild(b);
-        });
-        area.style.display = 'block';
+        // For Spades/Clubs non-choice is fine, but Clubs now has logic. 
+        // triggerAction handles Clubs logic correctly.
+        showChoice(validOptions.map(v=>({val:v})), (choice) => {
+            let s = pendingBonusSuit;
+            pendingBonusSuit = null;
+            triggerAction(choice, s, checkTurnEnd);
+        }, suit);
     }
 
     function showChoice(options, callback, suit) {
@@ -879,7 +978,6 @@
             let color = (suit === '♥' || suit === '♦') ? 'red' : 'black';
             let label = (suit==='♥')?'Trail':(suit==='♣')?'Town':(suit==='♦')?'Mine':'Badlands';
             
-            // HEADER UPDATE: Label to the top logic handled by CSS flex column direction
             iconDiv.className = `tracker-suit-icon ${color}`;
             iconDiv.innerHTML = `<span>${suit}</span> <span class="suit-name-label">${label}</span>`;
             row.appendChild(iconDiv);
@@ -889,7 +987,6 @@
             else renderGrid(row, suit);
             c.appendChild(row);
         });
-        // Grave
         let grow = document.createElement('div'); grow.className='tracker-row';
         let gicon = document.createElement('div'); gicon.className='tracker-suit-icon skull';
         gicon.innerHTML='<span>💀</span> <span class="suit-name-label">Grave</span>';
@@ -922,7 +1019,7 @@
                 let marked = markedActions['♠'].includes(v);
                 cell.className = `tracker-cell ${marked?'marked':''}`;
                 let info = SPADE_REWARDS[v];
-                let rtxt = `🚨${info.w} 💵${info.m} ⭐${info.s}`;
+                let rtxt = `🤠${info.w} 💵${info.m} ⭐${info.s}`;
                 cell.innerHTML = `<span class="cell-number">${(v===1)?'A':v}</span><span class="spade-rewards-text">${rtxt}</span><span class="mark-symbol">✓</span>`;
                 numsDiv.appendChild(cell);
             });
@@ -950,6 +1047,13 @@
                 let r = HEART_REWARDS[v];
                 let clr = (r.icon === '♦' || r.icon === '♥') ? 'red' : 'black';
                 extra = `<span class="bonus-indicator ${clr}">${r.icon}</span>`;
+            }
+            if(suit === '♣') {
+                // Show cost/bonus in clubs
+                let info = CLUB_INFO[v];
+                if(info) {
+                    extra = `<span class="club-rewards-text">${info.desc}</span>`;
+                }
             }
             cell.innerHTML = `<span class="cell-number">${(v===1)?'A':v}</span>${extra}<span class="mark-symbol">✓</span>`;
             grid.appendChild(cell);
@@ -1000,7 +1104,6 @@
         document.getElementById('restartGameBtn').style.display = 'block';
         document.getElementById('showScoreBtn').style.display = 'block';
         
-        // Populate Hand Visuals
         let handVis = document.getElementById('finalPokerHandVisual');
         handVis.innerHTML = '';
         savedPokerCards.forEach(c => {
@@ -1012,11 +1115,9 @@
             handVis.appendChild(d);
         });
         document.getElementById('finalPokerTitle').innerText = pokerHand;
-        // Safe update of pokerRewardText (element exists now)
         const prt = document.getElementById('pokerRewardText');
         if(prt) prt.innerText = `Poker Hand Reward: 💵${pMoney}, ⭐${pStar}`;
 
-        // Reveal Hidden
         let hEl = document.getElementById('overlayHiddenCard');
         hEl.className = `final-card-mini ${hiddenCard.color}`;
         hEl.innerText = `${hiddenCard.rank}${hiddenCard.suit}`;
@@ -1042,7 +1143,6 @@
             resEl.innerText = safe ? "SAFE!" : "ARRESTED!";
             resEl.className = `wanted-result show ${safe?'safe':'arrested'}`;
             
-            // Calculate Final
             let finalMoney = sMoney + pMoney + hammerBonus;
             let finalGold = sGold + panBonus;
             let finalStar = resources.star + pStar;
@@ -1065,14 +1165,12 @@
                 <tr class="score-total"><td>FINAL SCORE</td><td>${finalScore}</td></tr>
             </table>`;
             document.getElementById('finalScoreDisplay').innerHTML = html;
-            // ensure scoreSection exists (we added it to DOM), show it if present
             const ss = document.getElementById('scoreSection');
             if(ss) ss.style.display = 'block';
             
         }, 2000);
     }
 
-    // Utils
     function evaluatePokerHand(cards) {
         let v = cards.map(c=>c.value).sort((a,b)=>a-b);
         let s = cards.map(c=>c.suit);
