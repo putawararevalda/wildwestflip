@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wild West Flip - A Fliptown mini-adaptation</title>
+    <title>Fliptown Adapted - MVP</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -83,7 +83,7 @@
         .card-bottom { transform: rotate(180deg); }
         .card-center { font-size: 2rem; align-self: center; }
 
-        /* Toolbelt */
+        /* Toolbelt (Top) */
         .toolbelt-area {
             width: 100%; max-width: 600px; margin-bottom: 15px;
             background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px;
@@ -96,7 +96,6 @@
         .tool-box { width: 15px; height: 15px; border: 1px solid #7f8c8d; border-radius: 2px; background: rgba(0,0,0,0.2); }
         .tool-box.filled { background: var(--success); border-color: var(--success); }
         
-        /* Single Checkbox items */
         .tool-check { 
             width: 18px; height: 18px; border: 1px solid #7f8c8d; border-radius: 3px; 
             display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold;
@@ -115,6 +114,13 @@
         .tracker-suit-icon.red { color: var(--card-red); }
         .suit-name-label { font-size: 1rem; text-transform: uppercase; margin: 0; letter-spacing: 1px; font-weight: bold; color: #fff; opacity: 0.9; }
         
+        /* Equipment Bar Inside Suit */
+        .suit-equipment-bar {
+            display: flex; justify-content: center; gap: 20px; 
+            background: rgba(0,0,0,0.2); padding: 5px; 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
         .tracker-grid { flex: 1; padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
         .tracker-grid.horizontal-grid { grid-template-columns: repeat(6, 1fr); }
         .tracker-grid.four-col { grid-template-columns: repeat(4, 1fr); }
@@ -123,7 +129,7 @@
         .tracker-cell {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(255,255,255,0.1); border: 1px solid #7f8c8d;
-            border-radius: 4px; padding: 2px 6px; min-height: 45px; position: relative;
+            border-radius: 4px; padding: 2px 6px; min-height: 40px; position: relative;
         }
         .tracker-cell.marked { background-color: rgba(39, 174, 96, 0.2); border-color: var(--success); }
         .tracker-cell.crossed { background-color: rgba(192, 57, 43, 0.2); border-color: var(--danger); opacity: 0.6; }
@@ -201,8 +207,10 @@
         .rolling { animation: shake 0.1s infinite; background-color: #f1c40f; }
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
         .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; background: none; border: none; color: #7f8c8d; }
+        
         .choice-btn { background: #8e44ad; margin: 5px 0; padding: 15px; text-align: left; width: 100%; }
         .choice-btn:hover { background: #9b59b6; }
+        
         .score-table { width: 100%; margin-top: 15px; border-collapse: collapse; }
         .score-table td { padding: 5px; border-bottom: 1px solid #bdc3c7; text-align: left; }
         .score-table td:last-child { text-align: right; font-weight: bold; }
@@ -244,15 +252,13 @@
 
     <div class="game-board">
         <div class="toolbelt-area">
+            <!-- Row 1: Hammers/Pans -->
             <div class="tool-row">
                 <div class="tool-group"><div class="tool-icon">🔨</div><div class="tool-slots" id="hammerSlots"></div></div>
                 <div class="tool-group"><div class="tool-icon">🥘</div><div class="tool-slots" id="panSlots"></div></div>
             </div>
+            <!-- Row 2: Banks -->
             <div class="tool-row">
-                <div class="tool-group"><div class="tool-icon">🐎</div><div id="horseCheck"></div></div>
-                <div class="tool-group"><div class="tool-icon">🔫</div><div id="gunCheck"></div></div>
-                <div class="tool-group"><div class="tool-icon">🥷</div><div id="bandanaCheck"></div></div>
-                <div class="tool-group"><div class="tool-icon">⛏️</div><div id="pickaxeCheck"></div></div>
                 <div class="tool-group"><div class="tool-icon">🟥🏦</div><div id="redBankCheck"></div></div>
                 <div class="tool-group"><div class="tool-icon">⬛🏦</div><div id="blackBankCheck"></div></div>
             </div>
@@ -339,7 +345,6 @@
 <script>
     /* --- CONFIG --- */
     const SUITS = ['♠', '♥', '♣', '♦'];
-    const BOARD_SECTIONS = ['♠', '♥', '♣', '♦', '💀'];
     const RANKS = ['A', '2', '3', '4', '5', '6']; 
     const VALUES = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6};
     
@@ -350,6 +355,10 @@
         '♦': [],
         '💀': [1, 2, 3, 4]
     };
+    
+    // RENDER ORDER: Trail -> Badlands -> Mine -> Town -> Grave
+    // Actually suits order in array: Heart, Spade, Diamond, Club
+    const RENDER_ORDER_SUITS = ['♥', '♠', '♦', '♣'];
 
     const SPADE_REWARDS = {
         1: { animal: '🐔', w:1, s:1, m:1 }, 2: { animal: '🐔', w:1, s:1, m:2 },
@@ -397,7 +406,7 @@
     let markedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
     let crossedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
     let markedMines = [], claimedSpadeRows = [];
-    let clubVisits = []; // Tracks [1, 2, 6] which buildings visited
+    let clubVisits = []; 
     
     let resources = { money: 2, gold: 2, star: 0, wanted: 0 };
     let tools = { hammers: 0, pans: 0, horse:0, gun:0, bandana:0, pickaxe:0, redBank:0, blackBank:0 };
@@ -494,10 +503,6 @@
             let d = document.createElement('div'); d.className = `tool-box ${i<tools.pans ? 'filled':''}`; panDiv.appendChild(d);
         }
         
-        setToolCheck('horseCheck', tools.horse);
-        setToolCheck('gunCheck', tools.gun);
-        setToolCheck('bandanaCheck', tools.bandana);
-        setToolCheck('pickaxeCheck', tools.pickaxe);
         setToolCheck('redBankCheck', tools.redBank);
         setToolCheck('blackBankCheck', tools.blackBank);
     }
@@ -540,7 +545,6 @@
         currentHand = [drawCard(), drawCard(), drawCard()].filter(c => c);
         if(currentHand.length < 3) { log("Error: Not enough cards."); return; }
         
-        // Bank Check
         if(tools.redBank) {
             if(currentHand.every(c => c.color === 'red')) { resources.star += 2; log("Red Bank: +2 Stars!"); updateUI(); }
         }
@@ -616,7 +620,11 @@
         if(suitCard.suit === '♦') {
             if(getValidMineTargets(valCard.value).length === 0) { invalid = true; reason = "(Blocked)"; }
         }
-        
+        if(suitCard.suit === '♥') {
+            let opts = [1,2,3,4,5,6].filter(v => v <= valCard.value && !markedActions['♥'].includes(v) && !crossedActions['♥'].includes(v));
+            if(opts.length === 0) { invalid = true; reason = "(Full)"; }
+        }
+
         btn.innerHTML = `<span><b>${valCard.rank}</b> as Value, <b>${suitCard.suit}</b> as Suit</span><span>${reason}</span>`;
         if(invalid) btn.disabled = true;
         else btn.onclick = () => executeTurn(valCard.value, suitCard.suit);
@@ -733,7 +741,6 @@
             let vMinus = val - 2;
             let vPlus = val + 2;
             
-            // Collect potential targets for base, base-2, base+2
             let tBase = getValidMineTargets(baseVal);
             if(tBase.length > 0) options.push({val: baseVal, label: `Keep ${baseVal}`});
             
@@ -749,7 +756,6 @@
 
             if(options.length > 1) {
                 showChoice(options, (choiceVal) => {
-                    // Now process choiceVal
                     processDiamondValue(choiceVal, callback);
                 }, '♦ Pickaxe');
                 return;
@@ -797,6 +803,10 @@
         updateUI();
     }
 
+    function getRewardIcon(r) {
+        if(r==='hammer') return '🔨'; if(r==='pan') return '🥘'; return r;
+    }
+
     /* --- HEART LOGIC --- */
     function handleHeartAction(val, callback) {
         let maxVal = val;
@@ -831,13 +841,9 @@
 
     /* --- CLUB (TOWN) LOGIC --- */
     function handleClubAction(val, callback) {
-        // Define shop options based on val
         let options = [];
-        
-        // First Visit Bonus Logic happens AFTER shop interaction
         let firstVisit = !clubVisits.includes(val);
         
-        // Helper to wrap callback with bonus check
         const finishClub = () => {
             if(firstVisit) {
                 clubVisits.push(val);
@@ -863,7 +869,7 @@
         else if (val === 3) { if(resources.money >= 1 && !tools.bandana) options.push({val: 'buy', label: 'Buy Bandana ($1)'}); }
         else if (val === 5) { if(resources.money >= 1 && !tools.pickaxe) options.push({val: 'buy', label: 'Buy Pickaxe ($1)'}); }
         else if (val === 6) { if(resources.money >= 2 && !tools.gun) options.push({val: 'buy', label: 'Buy Gun ($2)'}); }
-        else if (val === 4) { // Sheriff Office
+        else if (val === 4) { 
             if(resources.money >= 1 && resources.wanted > 0) {
                 let maxPay = Math.min(4, resources.wanted, resources.money);
                 for(let i=1; i<=maxPay; i++) options.push({val: i, label: `Remove ${i} Wanted ($${i})`});
@@ -908,10 +914,15 @@
                 document.getElementById('mainBtn').style.display = 'none';
                 document.getElementById('endGameBtn').style.display = 'block';
                 document.getElementById('instructionText').innerText = "Game Over. Check Sheriff.";
+                try {
+                    // wait user click
+                } catch(e) {
+                    console.error('Error during endGameEvaluation:', e);
+                }
             } else {
                 document.getElementById('mainBtn').style.display = 'block';
-                document.getElementById('mainBtn').innerText = "Start Next Turn";
-                document.getElementById('instructionText').innerText = "Turn Complete.";
+                document.getElementById('mainBtn').innerText = 'Start Next Turn';
+                document.getElementById('instructionText').innerText = 'Turn Complete.';
                 gamePhase = 'IDLE';
             }
         }
@@ -940,8 +951,6 @@
             return;
         }
 
-        // For Spades/Clubs non-choice is fine, but Clubs now has logic. 
-        // triggerAction handles Clubs logic correctly.
         showChoice(validOptions.map(v=>({val:v})), (choice) => {
             let s = pendingBonusSuit;
             pendingBonusSuit = null;
@@ -971,9 +980,11 @@
     function renderTracker() {
         const c = document.getElementById('trackerBoard');
         c.innerHTML = '';
-        SUITS.forEach(suit => {
+        
+        RENDER_ORDER_SUITS.forEach(suit => {
             let row = document.createElement('div');
             row.className = 'tracker-row';
+            
             let iconDiv = document.createElement('div');
             let color = (suit === '♥' || suit === '♦') ? 'red' : 'black';
             let label = (suit==='♥')?'Trail':(suit==='♣')?'Town':(suit==='♦')?'Mine':'Badlands';
@@ -981,12 +992,18 @@
             iconDiv.className = `tracker-suit-icon ${color}`;
             iconDiv.innerHTML = `<span>${suit}</span> <span class="suit-name-label">${label}</span>`;
             row.appendChild(iconDiv);
+            
+            // Add Equipment Bar
+            if(suit === '♥') row.appendChild(createEquipBar([{icon:'🐎', val:tools.horse}]));
+            if(suit === '♦') row.appendChild(createEquipBar([{icon:'⛏️', val:tools.pickaxe}]));
+            if(suit === '♠') row.appendChild(createEquipBar([{icon:'🔫', val:tools.gun}, {icon:'🥷', val:tools.bandana}]));
 
             if(suit === '♠') renderSpadeRow(row);
             else if (suit === '♦') renderMine(row);
             else renderGrid(row, suit);
             c.appendChild(row);
         });
+        
         let grow = document.createElement('div'); grow.className='tracker-row';
         let gicon = document.createElement('div'); gicon.className='tracker-suit-icon skull';
         gicon.innerHTML='<span>💀</span> <span class="suit-name-label">Grave</span>';
@@ -1001,6 +1018,18 @@
         });
         grow.appendChild(ggrid);
         c.appendChild(grow);
+    }
+    
+    function createEquipBar(items) {
+        let bar = document.createElement('div');
+        bar.className = 'suit-equipment-bar';
+        items.forEach(item => {
+            let group = document.createElement('div');
+            group.style.display = 'flex'; group.style.gap='5px'; group.style.alignItems='center';
+            group.innerHTML = `<span style="font-size:1.2rem">${item.icon}</span><div class="tool-check ${item.val?'owned':''}">${item.val?'✓':''}</div>`;
+            bar.appendChild(group);
+        });
+        return bar;
     }
 
     function renderSpadeRow(row) {
@@ -1049,11 +1078,8 @@
                 extra = `<span class="bonus-indicator ${clr}">${r.icon}</span>`;
             }
             if(suit === '♣') {
-                // Show cost/bonus in clubs
                 let info = CLUB_INFO[v];
-                if(info) {
-                    extra = `<span class="club-rewards-text">${info.desc}</span>`;
-                }
+                if(info) extra = `<span class="club-rewards-text">${info.desc}</span>`;
             }
             cell.innerHTML = `<span class="cell-number">${(v===1)?'A':v}</span>${extra}<span class="mark-symbol">✓</span>`;
             grid.appendChild(cell);
