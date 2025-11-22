@@ -246,6 +246,7 @@
 </head>
 <body>
 
+
     <!-- GAME MENU OVERLAY -->
     <div id="gameMenuOverlay" class="overlay">
         <div class="overlay-content">
@@ -377,7 +378,7 @@
     <!-- RESULT OVERLAY -->
     <div class="overlay" id="resultOverlay">
         <div class="overlay-content">
-            <h2>Round Complete</h2>
+            <h2 id="roundCompleteTitle">Round Complete</h2>
             <div style="display:flex; justify-content:center; margin:10px 0;">
                 <div id="finalPokerHandVisual" style="display:flex; gap:5px;"></div>
             </div>
@@ -833,6 +834,8 @@
         GAMEMODE = CHOSEN_MODE;
 
         closeMenu();
+
+        updateRoundTitle(GAMEMODE,CURRENT_SIMULATED_DATE);
 
         let date = CURRENT_SIMULATED_DATE
         let data = PRELOADED_DECKS[date];
@@ -1811,6 +1814,15 @@
         if(robberyCallback) robberyCallback();
     }
 
+    function updateRoundTitle(gameMode, dateString) {
+        const titleEl = document.getElementById("roundCompleteTitle");
+
+        if (gameMode === "FIXED_DECK") {
+            titleEl.textContent = `Round Complete - (${dateString} Deck)`;
+        } else {
+            titleEl.textContent = "Round Complete - Random Deck";
+        }
+    }
     //initGame();
 </script>
 </body>
