@@ -236,9 +236,24 @@
         .red-suit {
             color: #e74c3c;
         }
+
+        /* MENU */
+        #gameMenuOverlay { display: flex; z-index: 2000; }
+        .menu-btn { padding: 15px; font-size: 1.2rem; margin: 10px 0; width: 100%; background: var(--accent); color: white; }
+        .menu-btn:hover { background: #d35400; }
+        #customDateSelect { padding: 10px; font-size: 1rem; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
+
+    <!-- GAME MENU OVERLAY -->
+    <div id="gameMenuOverlay" class="overlay">
+        <div class="overlay-content">
+            <h2>Select Game Mode</h2>
+            <button class="menu-btn" onclick="initGame()">Random Deck</button>
+            <button class="menu-btn" id="todayDeckBtn" onclick="initGame()">Today's Deck</button>
+        </div>
+    </div>
 
     <div class="header-container">
         <h1>Wild West Flip - A Fliptown mini-adaptation</h1>
@@ -637,6 +652,62 @@
         "Two Pair": {money: 3, star: 2}, "One Pair": {money: 2, star: 1}, "High Card": {money: 0, star: 0}
     };
 
+    /* --- DATA SOURCE --- */
+    const PRELOADED_DECKS = {
+      "2025-11-21": {
+        "sheriffCard": "4D",
+        "fullDeck": [
+          "6S", "3H", "AD", "5C", "2S",
+          "AC", "3D", "6C", "AH", "4S",
+          "5S", "2H", "AS", "3S", "6D",
+          "2D", "4C", "5D", "2C", "6H",
+          "3C", "5H", "4H"
+        ]
+      },
+      "2025-11-22": {
+        "sheriffCard": "AS",
+        "fullDeck": [
+          "3C", "6H", "2D", "5S", "AH",
+          "4C", "6C", "3H", "5C", "4H",
+          "2S", "AD", "6S", "3S", "5D",
+          "2C", "4D", "6D", "5H", "3D",
+          "4S", "2H", "AC"
+        ]
+      }
+    };
+
+    // let PRELOADED_DECKS = {};
+
+    async function loadDecks() {
+        try {
+            const response = await fetch("decks.json");
+            PRELOADED_DECKS = await response.json();
+            log("Decks loaded:", PRELOADED_DECKS);
+        } catch (err) {
+            log("Failed to load decks.json");
+            log(err);
+        }
+    }
+
+    function getTodayString() {
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+
+    // Call this BEFORE showing game mode select
+    // loadDecks();
+    
+    // Simulated "Today"
+    // const CURRENT_SIMULATED_DATE = "2025-11-22";
+    const CURRENT_SIMULATED_DATE = getTodayString();
+
+    const GAMEMODE = "RANDOM_DECK";
+
     /* --- STATE --- */
     let deck = [], discardPile = [], currentHand = [], savedPokerCards = [];
     let hiddenCard = null, lastDiscard = null;
@@ -661,9 +732,44 @@
         suitCost: 0, numCost: 0
     };
 
+    /* --- DECK UTILS --- */
+    function parseCardString(str) {
+        if(!str) return null;
+        let rankChar = str.slice(0, -1);
+        let suitChar = str.slice(-1);
+        
+        let sMap = {'S':'♠', 'H':'♥', 'D':'♦', 'C':'♣'};
+        let suit = sMap[suitChar] || suitChar; 
+        
+        let rank = rankChar; 
+        let val = (rank === 'A') ? 1 : parseInt(rank);
+        
+        let color = (suit === '♥' || suit === '♦') ? 'red' : 'black';
+        return { suit: suit, rank: rank, value: val, color: color };
+    }
+
     /* --- INIT --- */
     function initGame() {
-        deck = shuffle(createDeck());
+
+        closeMenu();
+
+        let date = CURRENT_SIMULATED_DATE
+        let data = PRELOADED_DECKS[date];
+
+        // make a condition for fixed deck or random deck
+        if(GAMEMODE === "RANDOM_DECK") {
+                deck = shuffle(createDeck());
+                hiddenCard = deck.pop();
+                log("New RANDOM game started.");
+                // print the deck content for debugging purposes
+                //log ("Deck Content: " + deck.map(c => c.rank + c.suit).join(", "));
+                } else {
+                deck = data.fullDeck.map(str => parseCardString(str)).reverse();
+                hiddenCard = parseCardString(data.sheriffCard);
+                log("New FIXED game started.");
+                //log ("Deck Content: " + deck.map(c => c.rank + c.suit).join(", "));
+        }
+
         discardPile = []; savedPokerCards = []; currentHand = [];
         markedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
         crossedActions = { '♠': [], '♥': [], '♣': [], '♦': [], '💀': [] };
@@ -674,10 +780,9 @@
         tools = { hammers: 0, pans: 0, horse:0, gun:0, bandana:0, pickaxe:0, redBank:0, blackBank:0 };
         
         gameEnded = false; 
-        hiddenCard = deck.pop();
         
         updateUI();
-        log("New game started.");
+        
         
         document.getElementById('resultOverlay').style.display = 'none';
         document.getElementById('showScoreBtn').style.display = 'none';
@@ -1615,6 +1720,8 @@
     function closeEquipment() { document.getElementById('equipmentOverlay').style.display='none'; }
     function openEquipment() { document.getElementById('equipmentOverlay').style.display='flex'; }
 
+    function closeMenu() { document.getElementById('gameMenuOverlay').style.display='none'; }
+
     function restartGame() { initGame(); }
     function openResultOverlay() { document.getElementById('resultOverlay').style.display='flex'; }
     function continueFromRobbery() {
@@ -1623,7 +1730,7 @@
         if(robberyCallback) robberyCallback();
     }
 
-    initGame();
+    //initGame();
 </script>
 </body>
 </html>
