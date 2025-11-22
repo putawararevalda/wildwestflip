@@ -223,6 +223,19 @@
         .score-table { width: 100%; margin-top: 15px; border-collapse: collapse; }
         .score-table td { padding: 5px; border-bottom: 1px solid #bdc3c7; text-align: left; }
         .score-table td:last-child { text-align: right; font-weight: bold; }
+
+        /* Modify Modal */
+        .mod-subtitle { font-size: 0.9rem; color: #bdc3c7; margin-bottom: 10px; }
+        .mod-section { margin-bottom: 20px; border-bottom: 1px solid #bdc3c7; padding-bottom: 10px; }
+        .mod-btn-grid { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+        .mod-option-btn { padding: 8px; min-width: 40px; background: #f4f7fb; border: 1px solid #95a5a6; cursor: pointer; }
+        .mod-option-btn:hover { background: #bdc3c7; }
+        .mod-option-btn.selected { background: var(--accent); border-color: white; }
+        .cost-badge { font-size: 0.7rem; color: var(--gold); display: block; }
+
+        .red-suit {
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
@@ -291,6 +304,33 @@
         <div id="choiceInputArea" style="display:none;">
             <h3>Select target for <span id="choiceLabel"></span>:</h3>
             <div class="bonus-input-area" id="choiceButtons"></div>
+        </div>
+
+        <!-- MODAL FOR MODIFICATION -->
+        <div id="modificationOverlay" class="overlay">
+            <div class="overlay-content">
+                <h2>Modify Action</h2>
+                <p class="mod-subtitle">Current Gold: 🪙<span id="modGoldDisplay"></span></p>
+                
+                <!-- Step 1: Suit -->
+                <div class="mod-section">
+                    <h4>1. Choose Suit (Cost: 2🪙 to change)</h4>
+                    <div class="mod-btn-grid" id="modSuitOptions"></div>
+                </div>
+
+                <!-- Step 2: Number -->
+                <div class="mod-section">
+                    <h4>2. Choose Number (Cost: 1🪙 per difference)</h4>
+                    <div class="mod-btn-grid" id="modNumOptions"></div>
+                </div>
+
+                <div style="margin-top:10px; font-weight:bold;">Total Cost: 🪙<span id="modTotalCost">0</span></div>
+                
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <button onclick="cancelModification()" class="btn-secondary">Cancel</button>
+                    <button onclick="confirmModification()">Confirm & Play</button>
+                </div>
+            </div>
         </div>
 
         <button id="mainBtn" onclick="startTurn()">Start Turn</button>
@@ -614,6 +654,13 @@
     let robberyCallback = null; 
     let gameEnded = false;
 
+    // Mod State
+    let modState = {
+        baseVal: 0, baseSuit: '',
+        newVal: 0, newSuit: '',
+        suitCost: 0, numCost: 0
+    };
+
     /* --- INIT --- */
     function initGame() {
         deck = shuffle(createDeck());
@@ -783,6 +830,11 @@
 
         createActionBtn(others[0], others[1], area);
         createActionBtn(others[1], others[0], area);
+
+        if(resources.gold > 0) {
+            createModifyBtn(others[0].value, others[1].suit, area);
+            createModifyBtn(others[1].value, others[0].suit, area);
+        }
         
         let graveBtn = document.createElement('button');
         graveBtn.className = 'graveyard-btn';
@@ -831,6 +883,108 @@
         else btn.onclick = () => executeTurn(valCard.value, suitCard.suit);
         area.appendChild(btn);
     }
+
+    function createModifyBtn(baseVal, baseSuit, area) {
+        let btn = document.createElement('button');
+        btn.className = 'modify-btn';
+        btn.innerHTML = `<span>Modify <b>${baseVal}</b> of <b>${baseSuit}</b></span><span>🛠️</span>`;
+        btn.onclick = () => initModification(baseVal, baseSuit);
+        area.appendChild(btn);
+    }
+
+    /* --- MODIFICATION LOGIC --- */
+    function initModification(baseVal, baseSuit) {
+        modState.baseVal = baseVal;
+        modState.baseSuit = baseSuit;
+        modState.newVal = baseVal;
+        modState.newSuit = baseSuit;
+        modState.suitCost = 0;
+        modState.numCost = 0;
+        
+        document.getElementById('modGoldDisplay').innerText = resources.gold;
+        //log("Will render the mod UI for modification.");
+        renderModUI();
+        document.getElementById('modificationOverlay').style.display = 'flex';
+        //log("MOD UI Rendered");
+        
+    }
+
+    function renderModUI() {
+        
+        const sDiv = document.getElementById('modSuitOptions');
+        sDiv.innerHTML = '';
+        SUITS.forEach(s => {
+            let btn = document.createElement('div');
+            let isSelected = (s === modState.newSuit);
+            let cost = (s === modState.baseSuit) ? 0 : 2;
+
+            // Add red text for Hearts or Diamonds
+            let isRed = (s === "♥" || s === "♦");
+
+            btn.className = `mod-option-btn ${isSelected ? 'selected' : ''} ${isRed ? 'red-suit' : ''}`;
+
+            btn.innerHTML = `${s} <span class="cost-badge">🪙${cost}</span>`;
+            // btn.className = `mod-option-btn ${isSelected ? 'selected' : ''}`;
+
+            // btn.innerHTML = `${s} <span class="cost-badge">🪙${cost}</span>`;
+            btn.onclick = () => {
+                modState.newSuit = s;
+                modState.suitCost = cost;
+                renderModUI();
+            };
+            sDiv.appendChild(btn);
+        });
+
+        const nDiv = document.getElementById('modNumOptions');
+        nDiv.innerHTML = '';
+        [1,2,3,4,5,6].forEach(n => {
+            let btn = document.createElement('div');
+            let isSelected = (n === modState.newVal);
+            let cost = Math.abs(n - modState.baseVal);
+            btn.className = `mod-option-btn ${isSelected ? 'selected' : ''}`;
+            btn.innerHTML = `${n} <span class="cost-badge">🪙${cost}</span>`;
+            btn.onclick = () => {
+                modState.newVal = n;
+                modState.numCost = cost;
+                renderModUI();
+            };
+            nDiv.appendChild(btn);
+        });
+
+        let total = modState.suitCost + modState.numCost;
+        document.getElementById('modTotalCost').innerText = total;
+        
+        let confirmBtn = document.querySelector('#modificationOverlay button:last-child');
+        if(total > resources.gold) {
+            confirmBtn.disabled = true;
+            confirmBtn.innerText = "Not Enough Gold";
+        } else {
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = "Confirm & Play";
+        }
+    }
+
+        function cancelModification() {
+        document.getElementById('modificationOverlay').style.display = 'none';
+    }
+
+    function confirmModification() {
+        let total = modState.suitCost + modState.numCost;
+        resources.gold -= total;
+        updateUI();
+        log(`Spent ${total} Gold to modify.`);
+        
+        document.getElementById('modificationOverlay').style.display = 'none';
+        
+        // Use UNIFIED Finalize Turn
+        //finalizeTurn(modState.newVal, modState.newSuit);
+        executeTurn(modState.newVal, modState.newSuit);
+    }
+
+    // Unified entry point for all turns
+    // function executeTurn(val, suit) {
+    //    finalizeTurn(val, suit);
+    //}
 
     function executeTurn(val, suit) {
         savedPokerCards.push(currentHand[pokerCardIndex]);
@@ -1189,9 +1343,9 @@
             iconDiv.innerHTML = `<span>${suit}</span> <span class="suit-name-label">${label}</span>`;
             row.appendChild(iconDiv);
             
-            if(suit === '♥') row.appendChild(createEquipBar([{icon:'🐎', val:tools.horse}]));
-            if(suit === '♦') row.appendChild(createEquipBar([{icon:'⛏️', val:tools.pickaxe}]));
-            if(suit === '♠') row.appendChild(createEquipBar([{icon:'🔫', val:tools.gun}, {icon:'🥷', val:tools.bandana}]));
+            if(suit === '♥') row.appendChild(createEquipBar([{icon:'🐎 (+3 to trail stop)', val:tools.horse}]));
+            if(suit === '♦') row.appendChild(createEquipBar([{icon:'⛏️ (+/2 in mine)', val:tools.pickaxe}]));
+            if(suit === '♠') row.appendChild(createEquipBar([{icon:'🔫 (+2 to card check value)', val:tools.gun}, {icon:'🥷 (-1 wanted regardless)', val:tools.bandana}]));
 
             if(suit === '♠') renderSpadeRow(row);
             else if (suit === '♦') renderMine(row);
@@ -1243,7 +1397,7 @@
                 let marked = markedActions['♠'].includes(v);
                 cell.className = `tracker-cell ${marked?'marked':''}`;
                 let info = SPADE_REWARDS[v];
-                let rtxt = `🤠${info.w} 💵${info.m} ⭐${info.s}`;
+                let rtxt = `🚨${info.w} 💵${info.m} ⭐${info.s}`;
                 cell.innerHTML = `<span class="cell-number">${(v===1)?'A':v}</span><span class="spade-rewards-text">${rtxt}</span><span class="mark-symbol">✓</span>`;
                 numsDiv.appendChild(cell);
             });
