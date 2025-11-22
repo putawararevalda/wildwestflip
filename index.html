@@ -610,8 +610,8 @@
 
     const HEART_REWARDS = {
         1: { type: 'star', val: 1, icon: '⭐' }, 2: { type: 'bonus', val: '♠', icon: '♠' },
-        3: { type: 'money', val: 6, icon: '💵' }, 4: { type: 'bonus', val: '♣', icon: '♣' },
-        5: { type: 'gold', val: 4, icon: '🪙' }, 6: { type: 'bonus', val: '♦', icon: '♦' }
+        3: { type: 'money', val: 6, icon: '6 💵' }, 4: { type: 'bonus', val: '♣', icon: '♣' },
+        5: { type: 'gold', val: 4, icon: '4 🪙' }, 6: { type: 'bonus', val: '♦', icon: '♦' }
     };
 
     const MINE_CHAMBERS = [
@@ -1556,7 +1556,8 @@
         let ptsMoney = Math.floor(finalMoneyVal / 4);
         let ptsGold = Math.floor(finalGoldVal / 2);
         let total = ptsMoney + ptsGold + finalStarVal;
-        let finalScore = isSafe ? total : Math.floor(total/2);
+        //let finalScore = isSafe ? total : Math.floor(total/2);
+        let finalScore = isSafe ? total : total - 4;
         
         let html = `
         <p style="font-size:0.8rem; color:#bdc3c7; margin-bottom:5px;">
@@ -1565,11 +1566,11 @@
             Gold: ${resources.gold} + ${panBonus} (🥘) = <b>${finalGoldVal}</b>
         </p>
         <table class="score-table">
-            <tr><td>Money ($${finalMoneyVal})</td><td>${ptsMoney}</td></tr>
+            <tr><td>Money (💵${finalMoneyVal})</td><td>${ptsMoney}</td></tr>
             <tr><td>Gold (🪙${finalGoldVal})</td><td>${ptsGold}</td></tr>
             <tr><td>Stars (⭐${finalStarVal})</td><td>${finalStarVal}</td></tr>
             <tr><td><b>Board Score</b></td><td><b>${total}</b></td></tr>
-            ${!isSafe ? '<tr><td style="color:var(--danger)">Arrested Penalty</td><td style="color:var(--danger)">/ 2</td></tr>' : ''}
+            ${!isSafe ? '<tr><td style="color:var(--danger)">Arrested Penalty</td><td style="color:var(--danger)">- 4</td></tr>' : ''}
             <tr class="score-total"><td>FINAL SCORE</td><td>${finalScore}</td></tr>
         </table>`;
         
