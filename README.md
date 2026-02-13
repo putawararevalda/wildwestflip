@@ -103,3 +103,7 @@ Potential improvements for future versions:
 * update the town (clubs) action
 * sheriff arrest is not based on a dice roll, but the wanted level
 * daily deck of card configuration, so user can compare their score
+
+---
+
+Built with love to Fliptown by: Revalda Putawara
